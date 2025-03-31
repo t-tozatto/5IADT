@@ -172,3 +172,14 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+/.idea/.gitignore
+/1_FundamentalsOfArtificialIntelligence/02/.idea/02.iml
+/.idea/5IADT.iml
+/.idea/misc.xml
+/1_FundamentalsOfArtificialIntelligence/02/.idea/misc.xml
+/.idea/modules.xml
+/1_FundamentalsOfArtificialIntelligence/02/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/1_FundamentalsOfArtificialIntelligence/02/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vcs.xml
+/1_FundamentalsOfArtificialIntelligence/02/.idea/vcs.xml
