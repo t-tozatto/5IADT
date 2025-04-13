@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
 
-SHOW_GRAPHICS = 0
+SHOW_GRAPHICS = 1
 
 #para mostrar todas as colunas no terminal
 pd.set_option('display.max_columns', None)
@@ -26,23 +27,58 @@ df.info()
 print('\nDESCRIBE')
 print(df.describe())
 
+print('\nSex')
+print(set(df['sex']))
+print(df['sex'].value_counts())
+
+print('\nSmoker')
+print(set(df['smoker']))
+print(df['smoker'].value_counts())
+
+print('\nRegion')
+print(set(df['region']))
+print(df['region'].value_counts())
+
 #kde true para mostrar a curva de densidade
 #histplot
 if SHOW_GRAPHICS == 1:
-    sns.displot(df['charges'], kde=True)
-    plt.title("Distribuição dos custos médicos")
-    plt.xlabel("Encargos")
-    plt.ylabel("Frequência")
+    # Seleciona colunas numéricas automaticamente
+    num_cols = df.select_dtypes(include='number').columns
+
+    # Define o tamanho da figura e o grid de subplots
+    plt.figure(figsize=(15, 10))
+
+    # Para cada coluna numérica, cria um histograma
+    for i, col in enumerate(num_cols, 1):
+        plt.subplot(2, 3, i)
+        sns.histplot(data=df, x=col, kde=True, bins=30, color='skyblue')
+        plt.title(f'Distribuição de {col}')
+        plt.xlabel(col)
+        plt.ylabel('Frequência')
+
+    plt.tight_layout()
     plt.show()
 
-# annot=True mostra os valores
-# cmap=coolwarm cores para identificar forças de correlação
-# azul negativo, vermelho positivo
-# 1=correlacao perfeita, 0=nenhuma correlacao, -1=correlação negativa perfeita
-if SHOW_GRAPHICS == 1:
-    sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm")
-    plt.title("Matriz de Correlação")
+    # Seleciona as colunas categóricas automaticamente
+    cat_cols = df.select_dtypes(include='object').columns
+
+    # Define o tamanho da figura e o grid
+    plt.figure(figsize=(15, 8))
+
+    # Cria um gráfico para cada coluna categórica
+    for i, col in enumerate(cat_cols, 1):
+        plt.subplot(1, len(cat_cols), i)  # Tudo em uma linha
+        sns.countplot(x=col, data=df, palette='pastel', hue=col, legend=False)
+        plt.title(f'Contagem de {col}')
+        plt.xticks(rotation=45)
+        plt.xlabel(col)
+        plt.ylabel('Frequência')
+
+    plt.tight_layout()
     plt.show()
+
+    # Calcular médias de charges por região
+    print(df.groupby('region')['charges'].mean().sort_values(ascending=False))
 
 ## ETAPA 2 - pre-processamento
 
@@ -50,17 +86,24 @@ if SHOW_GRAPHICS == 1:
 print('\nCount nulls')
 print(df.isnull().sum())
 
+#manualmente fazendo a map das variáveis de 2 valores
+df['sex'] = df['sex'].map({'male': 1, 'female': 0})
+df['smoker'] = df['smoker'].map({'yes': 1, 'no': 0})
+
+# annot=True mostra os valores
+# cmap=coolwarm cores para identificar forças de correlação
+# azul negativo, vermelho positivo
+# 1=correlacao perfeita, 0=nenhuma correlacao, -1=correlação negativa perfeita
+sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm")
+plt.title("Matriz de Correlação")
+plt.show()
+
 #pega variáveis com mais de 2 valores (não é sim/não..)
-#drop_first=True evita duplicidade de info
-df = pd.get_dummies(df, columns=['region'], drop_first=True)
+df = pd.get_dummies(df, columns=['region'], drop_first=False)
 
 # converte bool para int
 bool_cols = df.select_dtypes(include='bool').columns
 df[bool_cols] = df[bool_cols].astype(int)
-
-#manualmente fazendo a map das variáveis de 2 valores
-df['sex'] = df['sex'].map({'male': 1, 'female': 0})
-df['smoker'] = df['smoker'].map({'yes': 1, 'no': 0})
 
 print('\nHEAD')
 print(df.head())
@@ -79,6 +122,15 @@ y = df['charges']
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
+
+# Normalização
+# Identificar colunas numéricas para normalizar
+numeric_cols = ['age', 'bmi', 'children']  # ajuste conforme seu dataset
+
+# Aplicar o scaler apenas nelas
+scaler = StandardScaler()
+X_train[numeric_cols] = scaler.fit_transform(X_train[numeric_cols])
+X_test[numeric_cols] = scaler.transform(X_test[numeric_cols])
 
 #regressão linear
 model = LinearRegression()
@@ -111,5 +163,3 @@ print(f"RMSE: {rmse:.2f}")
 #Quanto mais próximo de 1, melhor o modelo está.
 #Se estiver muito baixo (tipo < 0.5), o modelo pode estar errando bastante ou não está captando bem os padrões.
 print(f"R²:   {r2:.4f}")
-
-
