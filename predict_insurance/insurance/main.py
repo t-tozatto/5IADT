@@ -13,7 +13,7 @@ pd.set_option('display.max_columns', None)
 
 ## ETAPA 1 - explorando e entendendo os dados
 # lendo o arquivo
-df = pd.read_csv('insurance.csv')
+df = pd.read_csv('insurance2.csv')
 
 #print nas primeiras linhas do arquivo
 print('\nHEAD')
