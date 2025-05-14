@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from scipy.stats import skewnorm
+from scipy.stats import skewnorm, truncnorm
 
 # ==============================================
 # CONFIGURAÇÕES INICIAIS
@@ -15,9 +15,10 @@ MISSING_PERCENT = 0.05
 
 def generate_base_data(n_samples):
     income = np.clip(skewnorm.rvs(-4, loc=5000, scale=2500, size=n_samples), 2000, 50000)
+    age = truncnorm((18 - 40) / 12, (65 - 40) / 12, loc=40, scale=12).rvs(n_samples).astype(int)
 
     data = {
-        'age': np.clip(np.random.normal(40, 12, n_samples), 18, 65).astype(int),
+        'age': age,
         'sex': np.random.choice(['male', 'female'], n_samples, p=[0.49, 0.51]),
         'region': np.random.choice(['north', 'south', 'east', 'west'], n_samples, p=[0.25, 0.35, 0.25, 0.15]),
         'bmi': np.clip(skewnorm.rvs(5, loc=25, scale=5, size=n_samples), 16, 40),
@@ -58,9 +59,9 @@ def add_engineered_features(df):
     # 4. Reatribuição de cobertura para idosos
     older_mask = df['age'] > 55
     df.loc[older_mask, 'coverage_level'] = np.random.choice(
-        ['standard', 'premium'],
+        ['basic', 'standard', 'premium'],
         size=older_mask.sum(),
-        p=[0.4, 0.6]
+        p=[0.1, 0.3, 0.6]  # Maior chance para premium
     )
 
     # Fatores regionais e de cobertura
