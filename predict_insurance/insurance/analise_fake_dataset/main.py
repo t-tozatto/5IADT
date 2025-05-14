@@ -69,13 +69,14 @@ perform_eda(df)
 # PRÉ-PROCESSAMENTO
 # ==============================================
 numeric_features = [
-    'age', 'bmi', 'chronic_conditions', 'genetic_risk',
-    'alcohol_consumption', 'income', 'regional_cost_factor', 'coverage_factor'
+    'age', 'bmi', 'smoker','chronic_conditions', 'genetic_risk',
+    'alcohol_consumption', 'income', 'regional_cost_factor', 'coverage_factor',
+    'dependents'
 ]
 
 categorical_features = [
-    'sex', 'smoker', 'region', 'exercise_frequency',
-    'diet_quality', 'occupation_risk', 'coverage_level'
+    'sex', 'region', 'exercise',
+    'diet', 'occupation_risk', 'coverage_level'
 ]
 
 # Verificar valores nulos
@@ -150,10 +151,13 @@ print(results_df)
 # OTIMIZAÇÃO DO XGBOOST
 # ==============================================
 param_grid = {
-    'regressor__n_estimators': [100, 200],
-    'regressor__learning_rate': [0.05, 0.1],
-    'regressor__max_depth': [3, 5],  # Reduzimos a profundidade máxima
-    'regressor__subsample': [0.8, 1.0],
+    'regressor__n_estimators': [100, 150, 200],  # Menor número de estimadores
+    'regressor__learning_rate': [0.05, 0.1],  # Taxa de aprendizado
+    'regressor__max_depth': [2, 3],  # Reduzindo a profundidade das árvores
+    'regressor__min_child_weight': [1, 5],  # Aumentar valor pode ajudar a reduzir overfitting
+    'regressor__gamma': [0, 0.1, 0.2],  # Ajustando gamma para controle de divisão das árvores
+    'regressor__subsample': [0.7, 0.8, 1.0],  # Ajustando a amostragem
+    'regressor__colsample_bytree': [0.7, 0.8],  # Ajustando o número de features por árvore
     'regressor__alpha': [0.1, 0.3],  # Regularização L1
     'regressor__lambda': [0.1, 0.3]  # Regularização L2
 }
@@ -163,13 +167,17 @@ best_model = GridSearchCV(
         ('preprocessor', preprocessor),
         ('regressor', XGBRegressor(random_state=42))
     ]),
-    param_grid,
+    param_grid=param_grid,
     cv=3,
     scoring='neg_mean_squared_error',
     verbose=2
 )
 
-best_model.fit(X_train, y_train)
+best_model.fit(X_train, y_train,
+               eval_metric="rmse",
+               eval_set=[(X_test, y_test)],
+               early_stopping_rounds=50)
+
 final_pred = best_model.best_estimator_.predict(X_test)
 
 print("\n=== Melhor Modelo (XGBoost Otimizado) ===")
