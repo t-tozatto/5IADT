@@ -121,9 +121,9 @@ def plot_categorical_distribution(df, categorical_features):
 
 # Gerar a análise de distribuição para as variáveis numéricas
 numeric_features = [
-    'age', 'bmi', 'chronic_conditions', 'genetic_risk',
-    'alcohol_consumption', 'income', 'regional_cost_factor', 'coverage_factor',
-    'dependents'
+    'age', 'chronic_condition',
+    'income',
+    'num_dependents'
 ]
 
 binary_features = [
@@ -131,8 +131,8 @@ binary_features = [
 ]
 
 categorical_features = [
-    'sex', 'region', 'exercise',
-    'diet', 'occupation_risk', 'coverage_level'
+    'sex', 'region', 'exercise_frequency', 'education', 'marital_status',
+    'diet_quality', 'occupation_risk', 'coverage_level', 'genetic_risk', 'alcohol_consumption', 'bmi'
 ]
 
 plot_feature_distribution(df, numeric_features)
