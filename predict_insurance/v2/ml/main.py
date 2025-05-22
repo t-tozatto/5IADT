@@ -43,56 +43,56 @@ print(df.describe(include=['object', 'bool']))
 
 
 
-### Análise das variáveis numéricas
-for col in numeric_vars:
-    fig, axes = plt.subplots(1, 2, figsize=(14, 4))
-
-    sns.histplot(df[col], kde=True, ax=axes[0], color='skyblue')
-    axes[0].set_title(f'Distribuição de {col}')
-
-    sns.boxplot(x=df[col], ax=axes[1], color='lightgreen')
-    axes[1].set_title(f'Boxplot de {col}')
-
-    plt.show()
-
-# Matriz
-corr = df[numeric_vars].corr()
-sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f")
-plt.title('Matriz de Correlação entre Variáveis Numéricas')
-plt.show()
-
-### Análise das variáveis booleanas
-for col in bool_vars:
-    counts = df[col].value_counts(normalize=True) * 100
-    print(f'\nDistribuição de {col} (%):\n{counts}')
-
-    sns.countplot(x=col, data=df)
-    plt.title(f'Distribuição da variável booleana {col}')
-    plt.show()
-
-### Análise das variáveis categóricas
-for col in categorical_vars:
-    print(f'\nContagem e porcentagem para {col}:')
-    print(df[col].value_counts())
-    print(df[col].value_counts(normalize=True).mul(100).round(2).astype(str) + '%')
-
-    plt.figure(figsize=(10, 4))
-    sns.countplot(y=col, data=df, order=df[col].value_counts().index, palette='pastel')
-    plt.title(f'Distribuição da variável categórica {col}')
-    plt.show()
-
-### Variáveis vs target
-for col in numeric_vars:
-    if col != target:
-        sns.scatterplot(x=df[col], y=df[target])
-        plt.title(f'Relação entre {col} e {target}')
-        plt.show()
-
-for col in categorical_vars + bool_vars:
-    plt.figure(figsize=(10,5))
-    sns.boxplot(x=df[col], y=df[target])
-    plt.title(f'{target} por categorias de {col}')
-    plt.show()
+# ### Análise das variáveis numéricas
+# for col in numeric_vars:
+#     fig, axes = plt.subplots(1, 2, figsize=(14, 4))
+#
+#     sns.histplot(df[col], kde=True, ax=axes[0], color='skyblue')
+#     axes[0].set_title(f'Distribuição de {col}')
+#
+#     sns.boxplot(x=df[col], ax=axes[1], color='lightgreen')
+#     axes[1].set_title(f'Boxplot de {col}')
+#
+#     plt.show()
+#
+# # Matriz
+# corr = df[numeric_vars].corr()
+# sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f")
+# plt.title('Matriz de Correlação entre Variáveis Numéricas')
+# plt.show()
+#
+# ### Análise das variáveis booleanas
+# for col in bool_vars:
+#     counts = df[col].value_counts(normalize=True) * 100
+#     print(f'\nDistribuição de {col} (%):\n{counts}')
+#
+#     sns.countplot(x=col, data=df)
+#     plt.title(f'Distribuição da variável booleana {col}')
+#     plt.show()
+#
+# ### Análise das variáveis categóricas
+# for col in categorical_vars:
+#     print(f'\nContagem e porcentagem para {col}:')
+#     print(df[col].value_counts())
+#     print(df[col].value_counts(normalize=True).mul(100).round(2).astype(str) + '%')
+#
+#     plt.figure(figsize=(10, 4))
+#     sns.countplot(y=col, data=df, order=df[col].value_counts().index, palette='pastel')
+#     plt.title(f'Distribuição da variável categórica {col}')
+#     plt.show()
+#
+# ### Variáveis vs target
+# for col in numeric_vars:
+#     if col != target:
+#         sns.scatterplot(x=df[col], y=df[target])
+#         plt.title(f'Relação entre {col} e {target}')
+#         plt.show()
+#
+# for col in categorical_vars + bool_vars:
+#     plt.figure(figsize=(10,5))
+#     sns.boxplot(x=df[col], y=df[target])
+#     plt.title(f'{target} por categorias de {col}')
+#     plt.show()
 
 ### Valores faltantes
 missing = df.isnull().sum()
